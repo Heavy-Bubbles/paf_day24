@@ -1,10 +1,14 @@
 package sg.edu.nus.iss.paf_day24.repository;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import sg.edu.nus.iss.paf_day24.exception.BankAccountNotFoundException;
 import sg.edu.nus.iss.paf_day24.model.BankAccount;
 
 @Repository
@@ -20,9 +24,15 @@ public class BankAccountRepo {
     // private final Stiring CREATE_ACCOUNT_SQL = "insert into bank_account values (?, ?, ?, ?, ?, ?)";
 
     public BankAccount getAccountById(Integer bankAccountId){
-        BankAccount bankAccount = jdbcTemplate.queryForObject(
-                GET_ACCOUNT_SQL, BeanPropertyRowMapper.newInstance(BankAccount.class),
-                bankAccountId);
+        List<BankAccount> bankAccounts = jdbcTemplate.query(GET_ACCOUNT_SQL,
+            BeanPropertyRowMapper.newInstance(BankAccount.class), bankAccountId);
+
+        if (bankAccounts.isEmpty()) {
+            throw new BankAccountNotFoundException("Account does not exist.");
+        }
+
+        BankAccount bankAccount = bankAccounts.get(0);
+
         return bankAccount;
     }
 
@@ -49,6 +59,12 @@ public class BankAccountRepo {
             bankAccount.getBalance());
 
         return result > 0 ? true : false;
+    }
+
+    @Transactional
+    public Boolean transferMoney(Integer withdrawAccountId, Integer depositAccountId,
+    Float transferAmount){
+        return false;
     }
 
 }
