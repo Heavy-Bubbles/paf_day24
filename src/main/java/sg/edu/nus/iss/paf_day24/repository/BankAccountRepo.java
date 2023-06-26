@@ -21,17 +21,34 @@ public class BankAccountRepo {
 
     public BankAccount getAccountById(Integer bankAccountId){
         BankAccount bankAccount = jdbcTemplate.queryForObject(
-                CREATE_ACCOUNT_SQL, BeanPropertyRowMapper.newInstance(BankAccount.class),
+                GET_ACCOUNT_SQL, BeanPropertyRowMapper.newInstance(BankAccount.class),
                 bankAccountId);
         return bankAccount;
     }
 
-    public Boolean withdrawAmount(Integer withdrawAccountId, float withdrawAmount) {
+    public Boolean withdrawAmount(Integer withdrawAccountId, Float withdrawAmount){
         Integer result = jdbcTemplate.update(WITHDRWAW_SQL,
             withdrawAmount, withdrawAccountId);
         
         return result > 0 ? true : false;
         
     }
-    
+
+    public Boolean depositAmount (Integer depositAccountId, Float depositAmount){
+        Integer result = jdbcTemplate.update(DEPOSIT_SQL,
+            depositAmount, depositAccountId);
+
+        return result > 0 ? true : false;
+
+    }
+
+    public Boolean createAccount (BankAccount bankAccount){
+        Integer result = jdbcTemplate.update(CREATE_ACCOUNT_SQL,
+            bankAccount.getFullName(), bankAccount.getIsBlocked(),
+            bankAccount.getIsActive(), bankAccount.getAccountType(),
+            bankAccount.getBalance());
+
+        return result > 0 ? true : false;
+    }
+
 }
